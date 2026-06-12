@@ -1,26 +1,13 @@
-name: Pipeline DevOps
+- name: Login Docker Hub
+  uses: docker/login-action@v3
+  with:
+    username: ${ secrets.DOCKER_USERNAME }
+    password: ${ secrets.DOCKER_PASSWORD }
 
-on:
-  push:
-    branches:
-      - main
+- name: Build Image
+  run: |
+    docker build -t usuario/aula-devops:1.0.${ gitlab-run_number }
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-        node-version: 22
-      - name: Install Dependencies
-        run: npm install
-      - name: Build Docker Image
-        run: docker build -t aula-devops .
-      - name: Login no Docker Hub
- 	uses: docker/login-action@v3
-  	with:
-    	username: ${{ secrets.DOCKER_USERNAME }}
-    	password: ${{ secrets.DOCKER_PASSWORD }}
+- name: Push Image
+  run: |
+    docker push usuario/aula-devops:1.0.${ gitlab-run_number }
